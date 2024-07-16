@@ -5,6 +5,21 @@ Steps on the way to making your own guessing game.
 
 import random
 
+def get_int_input(prompt):
+    while True:
+        try:
+            value = int(input(prompt))
+            return value
+        except ValueError:
+            print("That's not a valid number. Please enter an integer.")
+
+def get_bound_input(prompt, min_value=None):
+    while True:
+        value = get_int_input(prompt)
+        if min_value is not None and value <= min_value:
+            print(f"Please enter a number greater than {min_value}.")
+        else:
+            return value
 
 def advancedGuessingGame():
     """Play a guessing game with a user.
@@ -28,10 +43,30 @@ def advancedGuessingGame():
     Remember to think modular. Try to keep your functions small and single
     purpose if you can!
     """
+    print("\nWelcome to the advanced guessing game!")
+
+    lowerBound = get_bound_input("Enter a lower bound: ")
+    upperBound = get_bound_input("Enter an upper bound: ", lowerBound)
+
+    print(f"OK then, a number between {lowerBound} and {upperBound}.")
+
+    actualNumber = random.randint(lowerBound, upperBound)
+
+    guessed = False
+
+    while not guessed:
+        guessedNumber = get_int_input("Guess a number: ")
+        print(f"You guessed {guessedNumber},")
+        if guessedNumber < lowerBound or guessedNumber > upperBound:
+            print(f"Your guess is out of bounds! Please guess a number between {lowerBound} and {upperBound}.")
+        elif guessedNumber == actualNumber:
+            print(f"You got it!! It was {actualNumber}")
+            guessed = True
+        elif guessedNumber < actualNumber:
+            print("Too small, try again :'(")
+        else:
+            print("Too big, try again :'(")
 
     return "You got it!"
-    # the tests are looking for the exact string "You got it!". Don't modify that!
-
-
 if __name__ == "__main__":
     print(advancedGuessingGame())

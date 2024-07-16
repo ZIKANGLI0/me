@@ -40,7 +40,12 @@ def get_some_details():
     json_data = open(LOCAL + "/lazyduck.json").read()
 
     data = json.loads(json_data)
-    return {"lastName": None, "password": None, "postcodePlusID": None}
+    lastName = data['results'][0]['name']['last']
+    password = data['results'][0]['login']['password']
+    postcode = int(data['results'][0]['location']['postcode'])
+    IDvalue = int(data['results'][0]['id']['value'])
+    postcodePlusID = postcode + IDvalue
+    return {"lastName": lastName, "password": password, "postcodePlusID": postcodePlusID}
 
 
 def wordy_pyramid():
@@ -77,7 +82,18 @@ def wordy_pyramid():
     ]
     TIP: to add an argument to a URL, use: ?argName=argVal e.g. &wordlength=
     """
+    
     pyramid = []
+
+    for i in range(3,20,2):
+        url = f'https://us-central1-waldenpondpress.cloudfunctions.net/give_me_a_word?wordlength={i}'
+        response_text = requests.get(url).text
+        pyramid.append(response_text)
+
+    for j in range(20,2,-2):
+        url = f'https://us-central1-waldenpondpress.cloudfunctions.net/give_me_a_word?wordlength={j}'
+        response_text = requests.get(url).text
+        pyramid.append(response_text)
 
     return pyramid
 
@@ -96,13 +112,30 @@ def pokedex(low=1, high=5):
          get very long. If you are accessing a thing often, assign it to a
          variable and then future access will be easier.
     """
-    id = 5
-    url = f"https://pokeapi.co/api/v2/pokemon/{id}"
-    r = requests.get(url)
-    if r.status_code is 200:
-        the_json = json.loads(r.text)
+    max_height = 0
+    max_id = -1
+    for id in range(low,high+1):
+        url = f"https://pokeapi.co/api/v2/pokemon/{id}"
+        r = requests.get(url)
+        if r.status_code == 200:
+            the_json = json.loads(r.text)
+        curr_height = the_json['height']
+        if curr_height > max_height:
+            max_id = id
+            max_height = curr_height 
 
-    return {"name": None, "weight": None, "height": None}
+    
+        
+    url = f"https://pokeapi.co/api/v2/pokemon/{max_id}"
+    r = requests.get(url)
+    if r.status_code == 200:
+        the_json = json.loads(r.text)
+        the_json_name = the_json['name']
+        the_json_weight = the_json['weight']
+        the_json_height = the_json['height']
+    
+
+    return {"name": the_json_name, "weight": the_json_weight, "height": the_json_height}
 
 
 def diarist():
@@ -122,8 +155,34 @@ def diarist():
 
     NOTE: this function doesn't return anything. It has the _side effect_ of modifying the file system
     """
-    pass
+    
+    input_file_path = f'{LOCAL}/Trispokedovetiles(laser).gcode'
+    output_file_path = f'{LOCAL}/lasers.pew'
+    try:
+        with open(input_file_path, 'r') as file:
+            content = file.read()
+    except FileNotFoundError:
+        print(f"Error: The file {input_file_path} was not found.")
+        return
 
+    # Count the occurrences of "M10 P1"
+    command = "M10 P1"
+    count = content.count(command)
+
+    # Write the count to 'lasers.pew'
+    with open(output_file_path, 'w') as file:
+        file.write(str(count))
+
+
+if __name__ == "__main__":
+    print(get_some_details())
+
+    wp = wordy_pyramid()
+    [print(f"{word} {len(word)}") for word in wp]
+
+    print(pokedex(low=3, high=7))
+
+    diarist()
 
 if __name__ == "__main__":
     print(get_some_details())
@@ -145,3 +204,4 @@ if __name__ == "__main__":
         )
     elif in_set4:
         print("lasers.pew is in the right place")
+
