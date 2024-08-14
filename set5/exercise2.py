@@ -77,20 +77,42 @@ def italian_rules(word):
 
 
 def abba(source="abba", guard=3):
-    """Recursively replace letters acording to the rules.
+    def apply_rules(letter):
+        """控制替换规则。"""
+        if letter == "a":
+            return "baab"
+        elif letter == "b":
+            return "aob"
+        elif letter == "o":
+            return "aobba"
+        elif letter == "r":
+            return "roab"
+        elif letter == "f":
+            return "abf"
+        elif letter == "h":
+            return "hell"
+        elif letter == "e":
+            return "ell"
+        elif letter == "l":
+            return "l"
+        else:
+            return letter
 
-    This function takes a seed string, e.g. "abba" and replaces each letter in
-    turn acording to the rules. These rules can be of arbitrary complexity.
+    if guard == -1:
+        return source
 
-    Modify the rules to map from:
+    result = "".join(apply_rules(letter) for letter in source)
+    return abba(result, guard - 1)
 
-                   abba
-                    to
-               bbaaobaobbba
-                    to
-    aobaobbbabbaoaaobbbaoaaobaobaobbba
-                and so on...
-    """
+# 测试输出
+if __name__ == "__main__":
+    print(abba(source="abba", guard=3))
+    print(abba(source="roof", guard=3))
+    print(abba(source="hell", guard=3))
+
+
+if __name__ == "__main__":
+    print("AB:", abba())
 
     def apply_rules(letter):
         """Control the substitution.
@@ -146,7 +168,7 @@ def draw_koch(drawing_method, steps_deep=4):
 def square_koch(t, order, size):
     r"""Draw a koch curve with a square rather than a triangular point.
 
-           _
+
     e.g. _| |_ rather than _/\_
 
     Leave the turtle facing the same direction.
@@ -154,8 +176,8 @@ def square_koch(t, order, size):
     """
     trace = ""
     # write the rest of the function here.
-    return str(order) + trace
-    pass
+    return str(order) + trace 
+pass
 
 
 def draw_square(steps=4):
